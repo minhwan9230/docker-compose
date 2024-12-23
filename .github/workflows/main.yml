@@ -18,7 +18,7 @@ jobs:
       - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST_tp }}
+          host: ${{ secrets.EC2_HOST_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_KEY}}
           script_stop: true

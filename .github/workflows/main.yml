@@ -1,26 +1,31 @@
-name: Deploy to EC2 using Docker Compose
+name: Deploy To EC2 docker-compose
 
 on:
   push:
     branches:
-      -main
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    env:
+      REPOSITORY_NAME: docker-compose
 
-      - name: Setup SSH
+    steps:
+      - name: Github Repository 파일 불러오기
+        uses: actions/checkout@v4
+
+      - name: SSH로 EC2에 접속하기
         uses: appleboy/ssh-action@master
         with:
+          host: ${{ secrets.EC2_HOST_tp }}
           username: ubuntu
-          host: ${{ secrets.EC2_HOST_tp}}
           key: ${{ secrets.SSH_KEY}}
+          script_stop: true
           script: |
-            cd /home/ubuntu/docker_cpmpose
-            sudo git pull otigin main
+            cd /home/ubuntu/${{ env.REPOSITORY_NAME }}
+            sudo git pull origin main
             sudo docker-compose down
+            sudo docker system prune -f
             sudo docker-compose up -d --build
+            

@@ -1,0 +1,44 @@
+services:
+  db:
+    build:
+      context: ./dockerdb
+      dockerfile: Dockerfile
+    ports:
+      - 3308:3306
+    volumes:
+      - ./dockerdb/store:/var/lib/mysql
+    networks:
+      - container_network
+
+  backend:
+    build:
+      context: ./dockerbackend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/shop?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_DRIVER: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+    networks:
+      - container_network
+
+
+  frontend:
+    build:
+      context: ./dockerfrontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    networks:
+      - container_network
+
+networks:
+  container_network:
